@@ -2,374 +2,317 @@
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 
-// Campaign Component logic
 interface CampaignData {
-    audience_result: any;
-    research_result: any;
-    strategy_result: any;
-    content_result: any;
+    context?: any;
+    audience?: any;
+    emotion?: any;
+    trends?: any;
+    competitor?: any;
+    content?: any;
+    status?: string;
 }
 
 export function CampaignTabs({ campaign }: { campaign: CampaignData }) {
-    const { audience_result, research_result, strategy_result, content_result } = campaign;
+    const [mainTab, setMainTab] = useState<'analysis' | 'content'>('analysis');
+    const [contentTab, setContentTab] = useState<'instagram' | 'twitter' | 'linkedin'>('instagram');
 
-    const isAudienceReady = !!audience_result;
-    const isResearchReady = !!research_result;
-    const isStrategyReady = !!strategy_result;
-    const isContentReady = !!content_result;
-
-    const [activeTab, setActiveTab] = useState('audience');
-
-    const tabs = [
-        { id: 'audience', label: 'Audience', icon: '👥', ready: isAudienceReady },
-        { id: 'research', label: 'Research', icon: '🔍', ready: isResearchReady },
-        { id: 'strategy', label: 'Strategy', icon: '🧠', ready: isStrategyReady },
-        { id: 'content', label: 'Content', icon: '✍️', ready: isContentReady },
-    ];
+    const isContentReady = !!campaign.content;
 
     return (
         <div className="w-full">
-            {/* Tab Buttons */}
-            <div className="flex gap-2 p-1 bg-white/5 rounded-xl">
-                {tabs.map((tab) => (
+            {/* Main Tabs (Pill Style) */}
+            <div className="flex justify-center mb-8">
+                <div className="bg-gray-100 p-1 rounded-full inline-flex">
                     <button
-                        key={tab.id}
-                        onClick={() => tab.ready && setActiveTab(tab.id)}
-                        disabled={!tab.ready}
+                        onClick={() => setMainTab('analysis')}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer",
-                            activeTab === tab.id
-                                ? "bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25"
-                                : "text-gray-400 hover:text-white hover:bg-white/5",
-                            !tab.ready && "opacity-40 cursor-not-allowed"
+                            "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300",
+                            mainTab === 'analysis'
+                                ? "bg-white text-gray-900 shadow-sm"
+                                : "text-gray-500 hover:text-gray-900"
                         )}
                     >
-                        <span className="text-lg">{tab.icon}</span>
-                        {tab.label}
+                        Analysis & Strategy
                     </button>
-                ))}
+                    <button
+                        onClick={() => setMainTab('content')}
+                        disabled={!isContentReady}
+                        className={cn(
+                            "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300",
+                            mainTab === 'content'
+                                ? "bg-white text-gray-900 shadow-sm"
+                                : "text-gray-500 hover:text-gray-900",
+                            !isContentReady && "opacity-50 cursor-not-allowed"
+                        )}
+                    >
+                        Content Generation
+                    </button>
+                </div>
             </div>
 
-            {/* Tab Content */}
-            <div className="mt-6">
-                {activeTab === 'audience' && (
-                    <div className="space-y-4 animate-in fade-in-0 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                                <span className="text-xl">👥</span>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Audience Analysis</h3>
-                                <p className="text-gray-400 text-sm">Target audience insights and segmentation</p>
-                            </div>
-                        </div>
+            {/* Tab Panels */}
+            {mainTab === 'analysis' ? (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                        {audience_result ? (
-                            <div className="space-y-4">
-                                {/* Validation Status */}
-                                <div className={cn(
-                                    "p-4 rounded-xl border",
-                                    audience_result.validation === "Valid"
-                                        ? "bg-green-500/10 border-green-500/20"
-                                        : "bg-yellow-500/10 border-yellow-500/20"
-                                )}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className={audience_result.validation === "Valid" ? "text-green-400" : "text-yellow-400"}>
-                                            {audience_result.validation === "Valid" ? "✓" : "⚠"}
-                                        </span>
-                                        <span className={cn(
-                                            "font-medium",
-                                            audience_result.validation === "Valid" ? "text-green-400" : "text-yellow-400"
-                                        )}>
-                                            {audience_result.validation || "Analyzed"}
-                                        </span>
+                    {/* 1. Context & Audience */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <SectionCard title="Target Audience" icon="👥">
+                            {campaign.audience ? (
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                                        <div className="text-purple-900 font-semibold mb-1">Primary Persona</div>
+                                        <div className="text-purple-700">{campaign.audience.primary_persona || "Analyzing..."}</div>
                                     </div>
-                                    <p className="text-gray-300">{audience_result.critique || audience_result.analysis || JSON.stringify(audience_result)}</p>
-                                </div>
 
-                                {/* Personas */}
-                                {audience_result.personas && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-400 mb-3">Micro-Personas</h4>
-                                        <div className="grid gap-3">
-                                            {audience_result.personas.map((persona: any, i: number) => (
-                                                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                    <h5 className="text-purple-400 font-medium mb-2">{persona.name}</h5>
-                                                    <p className="text-gray-400 text-sm mb-1"><strong>Pain Point:</strong> {persona.pain_point}</p>
-                                                    <p className="text-gray-400 text-sm"><strong>Hook:</strong> {persona.hook}</p>
-                                                </div>
+                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Beliefs</div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {campaign.audience.beliefs?.map((b: string, i: number) => (
+                                                <span key={i} className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 shadow-sm">{b}</span>
                                             ))}
                                         </div>
                                     </div>
-                                )}
+                                </div>
+                            ) : <Skeleton />}
+                        </SectionCard>
 
-                                {/* Fallback for old data format */}
-                                {audience_result.data && (
-                                    <>
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                            <p className="text-gray-300 leading-relaxed">{audience_result.data.analysis}</p>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-medium text-gray-400 mb-3">Key Segments</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {audience_result.data.segments?.map((seg: string, i: number) => (
-                                                    <span
-                                                        key={i}
-                                                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 text-blue-300 text-sm font-medium"
-                                                    >
-                                                        {seg}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ) : (
-                            <WaitingState message="Analyzing target audience..." />
-                        )}
+                        <SectionCard title="Market Context" icon="🌍">
+                            {campaign.context ? (
+                                <div className="space-y-4">
+                                    <InfoRow label="Market" value={campaign.context.market_category} />
+                                    <InfoRow label="Goal" value={campaign.context.campaign_intent} />
+                                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                        <div className="text-blue-900 font-semibold mb-1">Product Summary</div>
+                                        <div className="text-blue-700 text-sm leading-relaxed">{campaign.context.product_summary}</div>
+                                    </div>
+                                </div>
+                            ) : <Skeleton />}
+                        </SectionCard>
                     </div>
-                )}
 
-                {activeTab === 'research' && (
-                    <div className="space-y-4 animate-in fade-in-0 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                                <span className="text-xl">🔍</span>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Market Research</h3>
-                                <p className="text-gray-400 text-sm">Competitive analysis and market insights</p>
-                            </div>
-                        </div>
-
-                        {research_result ? (
-                            <div className="grid gap-4">
-                                {/* Competitor Weakness */}
-                                <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 rounded-xl p-5">
-                                    <h4 className="text-sm font-medium text-red-400 mb-2">Competitor Weakness (Kill Shot)</h4>
-                                    <p className="text-white font-medium text-lg">{research_result.competitor_weakness || research_result.data?.summary}</p>
-                                </div>
-
-                                {/* Market Gap */}
-                                {research_result.market_gap && (
-                                    <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-green-400 mb-2">Market Gap (Opportunity)</h4>
-                                        <p className="text-gray-300">{research_result.market_gap}</p>
-                                    </div>
-                                )}
-
-                                {/* Pricing Model */}
-                                {research_result.pricing_model && (
-                                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-cyan-400 mb-2">Competitor Pricing Model</h4>
-                                        <p className="text-gray-300">{research_result.pricing_model}</p>
-                                    </div>
-                                )}
-
-                                {/* Fallback for old format */}
-                                {research_result.data && (
-                                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-purple-400 mb-2">Analysis</h4>
-                                        <p className="text-gray-300">{research_result.data.competitor_analysis}</p>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <WaitingState message="Researching market and competitors..." />
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'strategy' && (
-                    <div className="space-y-4 animate-in fade-in-0 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                <span className="text-xl">🧠</span>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Campaign Strategy</h3>
-                                <p className="text-gray-400 text-sm">Strategic recommendations and action plan</p>
-                            </div>
-                        </div>
-
-                        {strategy_result ? (
-                            <div className="grid gap-4">
-                                {/* Core Message */}
-                                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-5">
-                                    <h4 className="text-sm font-medium text-purple-400 mb-2">Core Message</h4>
-                                    <p className="text-white font-bold text-xl">{strategy_result.core_message || strategy_result.data?.angle}</p>
-                                </div>
-
-                                {/* Attack Angle */}
-                                {strategy_result.attack_angle && (
-                                    <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-orange-400 mb-2">Attack Angle</h4>
-                                        <p className="text-gray-300">{strategy_result.attack_angle}</p>
-                                    </div>
-                                )}
-
-                                {/* Channels */}
-                                {strategy_result.channels && (
-                                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-cyan-400 mb-3">Channel Strategy</h4>
-                                        <div className="space-y-3">
-                                            {strategy_result.channels.map((channel: any, i: number) => (
-                                                <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                                    <div>
-                                                        <span className="text-white font-medium">{channel.name}</span>
-                                                        <p className="text-gray-400 text-sm">{channel.reason}</p>
-                                                    </div>
-                                                    <span className="text-cyan-400 font-bold">{channel.budget_split}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Fallback for old format */}
-                                {strategy_result.data && (
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                            <h4 className="text-sm font-medium text-cyan-400 mb-3">Channels</h4>
-                                            <div className="space-y-2">
-                                                {strategy_result.data.channels?.map((chan: string, i: number) => (
-                                                    <div key={i} className="flex items-center gap-2 text-gray-300">
-                                                        <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
-                                                        {chan}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                            <h4 className="text-sm font-medium text-purple-400 mb-3">Tactics</h4>
-                                            <div className="space-y-2">
-                                                {strategy_result.data.tactics?.map((tactic: string, i: number) => (
-                                                    <div key={i} className="flex items-center gap-2 text-gray-300">
-                                                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                                                        {tactic}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <WaitingState message="Generating campaign strategy..." />
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'content' && (
-                    <div className="space-y-4 animate-in fade-in-0 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                                <span className="text-xl">✍️</span>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Ad Content</h3>
-                                <p className="text-gray-400 text-sm">Generated ad copy and creative assets</p>
-                            </div>
-                        </div>
-
-                        {content_result ? (
-                            <div className="space-y-4">
-                                {/* Main Ad Copy */}
-                                <div className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border border-purple-500/20 rounded-xl p-6">
-                                    <h4 className="text-sm font-medium text-purple-400 mb-3">Main Ad Copy</h4>
-                                    <blockquote className="text-xl text-white font-medium italic leading-relaxed">
-                                        &quot;{content_result.ad_copy_main || content_result.data?.ad_copy}&quot;
-                                    </blockquote>
-                                </div>
-
-                                {/* Ad Hook */}
-                                {content_result.ad_hook && (
-                                    <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-cyan-400 mb-2">Video Hook (First 3 Seconds)</h4>
-                                        <p className="text-white font-medium">{content_result.ad_hook}</p>
-                                    </div>
-                                )}
-
-                                {/* Visual Prompt */}
-                                {content_result.visual_prompt && (
-                                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                        <h4 className="text-sm font-medium text-pink-400 mb-2">AI Image Prompt</h4>
-                                        <p className="text-gray-300 italic">{content_result.visual_prompt}</p>
-                                    </div>
-                                )}
-
-                                {/* Safety Audit */}
-                                <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
-                                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
-                                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p className="text-green-400 font-medium">Safety Audit</p>
-                                        <p className="text-gray-400 text-sm">{content_result.safety_audit || content_result.data?.safety_check || "Passed"}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <WaitingState message="Creating ad content..." />
-                        )}
-
-                        {/* Instagram Posts Section - User Requested Feature */}
-                        {content_result && content_result.instagram_posts && (
-                            <div className="space-y-4 animate-in fade-in-0 duration-500 delay-150">
-                                <div className="flex items-center gap-3 mt-8 mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
-                                        <span className="text-xl">📸</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white">Instagram Strategy</h3>
-                                        <p className="text-gray-400 text-sm">Social media content for Nano Banana Pro</p>
-                                    </div>
-                                </div>
-
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    {content_result.instagram_posts.map((post: any, i: number) => (
-                                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-pink-500/30 transition-all group">
-                                            {/* Mock Image Placeholder */}
-                                            <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
-                                                <div className="absolute inset-0 bg-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                <div className="text-center p-4">
-                                                    <span className="text-4xl mb-2 block">🍌</span>
-                                                    <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Visual Concept</p>
-                                                    <p className="text-gray-400 text-sm mt-2">{post.image_idea}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5">
-                                                <div className="mb-3">
-                                                    <span className="text-xs font-bold text-pink-400 uppercase tracking-wider">Key/Message</span>
-                                                    <p className="text-gray-300 text-sm line-clamp-2">{post.key_message_ref}</p>
-                                                </div>
-
-                                                <div>
-                                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Caption</span>
-                                                    <p className="text-white text-sm whitespace-pre-wrap mt-1 font-medium">{post.post_caption}</p>
-                                                </div>
+                    {/* 2. Deep Dive (Trends & Competitors) */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <SectionCard title="Trend Analysis" icon="📈">
+                            {campaign.trends ? (
+                                <div className="space-y-4">
+                                    {campaign.trends.narrative_trends_aligned?.map((trend: any, i: number) => (
+                                        <div key={i} className="flex gap-3 items-start">
+                                            <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold mt-0.5">✓</div>
+                                            <div className="flex-1">
+                                                {typeof trend === 'string' ? (
+                                                    <p className="text-gray-600 text-sm">{trend}</p>
+                                                ) : (
+                                                    <>
+                                                        <p className="text-gray-900 font-semibold text-sm mb-1">{trend.trend_name || trend.name}</p>
+                                                        <p className="text-gray-600 text-sm">{trend.description}</p>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
+                                    {campaign.trends.fatigued_patterns?.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t border-gray-100">
+                                            <div className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2">Avoid (Fatigue)</div>
+                                            {campaign.trends.fatigued_patterns.map((bad: any, i: number) => (
+                                                <p key={i} className="text-gray-500 text-sm mb-1">
+                                                    • {typeof bad === 'string' ? bad : bad.pattern || bad.description}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : <Skeleton />}
+                        </SectionCard>
+
+                        <SectionCard title="Competitor Landscape" icon="⚔️">
+                            {campaign.competitor ? (
+                                <div className="space-y-3">
+                                    {campaign.competitor.positioning_gaps?.map((gap: any, i: number) => (
+                                        <div key={i} className="p-3 bg-orange-50 rounded-lg border border-orange-100 text-orange-800 text-sm">
+                                            {typeof gap === 'string' ? (
+                                                <span className="font-medium">🎯 Gap: {gap}</span>
+                                            ) : (
+                                                <>
+                                                    <div className="font-bold mb-1">🎯 {gap.gap_name || 'Gap'}</div>
+                                                    <div className="text-xs">{gap.description}</div>
+                                                    {gap.potential_positioning_statement && (
+                                                        <div className="mt-2 text-xs italic text-orange-700">💡 {gap.potential_positioning_statement}</div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <div className="space-y-2 mt-2">
+                                        {campaign.competitor.counter_narratives?.map((cn: any, i: number) => (
+                                            <p key={i} className="text-gray-500 text-sm pl-2 border-l-2 border-gray-200">
+                                                {typeof cn === 'string' ? cn : cn.narrative || cn.description}
+                                            </p>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : <Skeleton />}
+                        </SectionCard>
+                    </div>
+                </div>
+            ) : (
+                /* CONTENT TAB */
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="grid md:grid-cols-12 gap-8">
+                        {/* Sidebar */}
+                        <div className="md:col-span-3 space-y-2">
+                            <SocialButton
+                                active={contentTab === 'instagram'}
+                                onClick={() => setContentTab('instagram')}
+                                icon="📸" label="Instagram"
+                            />
+                            <SocialButton
+                                active={contentTab === 'twitter'}
+                                onClick={() => setContentTab('twitter')}
+                                icon="🐦" label="Twitter / X"
+                            />
+                            <SocialButton
+                                active={contentTab === 'linkedin'}
+                                onClick={() => setContentTab('linkedin')}
+                                icon="💼" label="LinkedIn"
+                            />
+                        </div>
+
+                        {/* Preview Area */}
+                        <div className="md:col-span-9">
+                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden min-h-[500px]">
+                                {/* Mockup Header */}
+                                <div className="h-12 bg-gray-50 border-b border-gray-100 flex items-center px-4 gap-2">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-3 h-3 rounded-full bg-red-400/20"></div>
+                                        <div className="w-3 h-3 rounded-full bg-yellow-400/20"></div>
+                                        <div className="w-3 h-3 rounded-full bg-green-400/20"></div>
+                                    </div>
+                                    <div className="ml-auto text-xs text-gray-400 font-mono">
+                                        {contentTab === 'instagram' ? 'instagram.com' : contentTab === 'twitter' ? 'x.com' : 'linkedin.com'}
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="p-8">
+                                    {contentTab === 'instagram' && campaign.content?.instagram && (
+                                        <div className="max-w-md mx-auto space-y-6">
+                                            {/* Image Placeholder */}
+                                            <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 flex-col gap-2 p-8 text-center border-2 border-dashed border-gray-200">
+                                                <span className="text-2xl">🖼️</span>
+                                                <span className="text-sm font-medium">Visual Concept</span>
+                                                <span className="text-xs">{campaign.content.instagram.visual_description}</span>
+                                            </div>
+                                            {/* Caption */}
+                                            <div className="space-y-2">
+                                                <div className="flex gap-2 items-center">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600"></div>
+                                                    <div className="text-sm font-bold">your_brand</div>
+                                                </div>
+                                                <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                                    {campaign.content.instagram.caption}
+                                                </p>
+                                                <div className="text-blue-600 text-sm">
+                                                    {campaign.content.instagram.hashtags?.map((t: string) => `#${t} `)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {contentTab === 'twitter' && campaign.content?.twitter_thread && (
+                                        <div className="max-w-md mx-auto relative pl-8 space-y-8 before:absolute before:left-[15px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gray-100">
+                                            {campaign.content.twitter_thread.map((tweet: string, i: number) => (
+                                                <div key={i} className="relative">
+                                                    <div className="absolute -left-8 top-0 w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-xs font-bold border-4 border-white">
+                                                        {i + 1}
+                                                    </div>
+                                                    <div className="bg-gray-50 p-4 rounded-xl rounded-tl-none border border-gray-100">
+                                                        <div className="flex gap-2 items-center mb-2">
+                                                            <div className="font-bold text-gray-900">Your Brand</div>
+                                                            <div className="text-gray-400 text-sm">@handle</div>
+                                                        </div>
+                                                        <p className="text-gray-800 whitespace-pre-wrap">{tweet}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {contentTab === 'linkedin' && campaign.content?.linkedin_post && (
+                                        <div className="max-w-xl mx-auto bg-white border border-gray-200 rounded-xl overflow-hidden">
+                                            <div className="p-4 border-b border-gray-100 flex gap-3">
+                                                <div className="w-12 h-12 rounded bg-blue-600"></div>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">Your Brand</div>
+                                                    <div className="text-xs text-gray-500">Promoted</div>
+                                                </div>
+                                            </div>
+                                            <div className="p-4">
+                                                <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                                                    {campaign.content.linkedin_post.text}
+                                                </p>
+                                            </div>
+                                            {campaign.content.linkedin_post.professional_tone_notes && (
+                                                <div className="bg-blue-50 p-3 text-xs text-blue-700 m-4 rounded-lg">
+                                                    💡 Tone Note: {campaign.content.linkedin_post.professional_tone_notes}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
 
-function WaitingState({ message }: { message: string }) {
+// Sub-components for cleaner code
+function SectionCard({ title, icon, children }: { title: string, icon: string, children: React.ReactNode }) {
     return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-400">{message}</p>
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-xl">{icon}</div>
+                <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+            </div>
+            {children}
+        </div>
+    );
+}
+
+function InfoRow({ label, value }: { label: string, value: string }) {
+    return (
+        <div className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+            <span className="text-gray-500 text-sm font-medium">{label}</span>
+            <span className="text-gray-900 text-sm font-semibold">{value || "—"}</span>
+        </div>
+    );
+}
+
+function SocialButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: string, label: string }) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left",
+                active
+                    ? "bg-gray-900 text-white shadow-lg"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+            )}
+        >
+            <span className="text-lg">{icon}</span>
+            <span className="font-medium text-sm">{label}</span>
+        </button>
+    );
+}
+
+function Skeleton() {
+    return (
+        <div className="space-y-3 animate-pulse">
+            <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-100 rounded w-2/3"></div>
         </div>
     );
 }

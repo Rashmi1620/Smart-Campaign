@@ -273,14 +273,6 @@ def agent_content_generation(state: NarrativeState):
     trends = state.get("trends", {})
     competitor = state.get("competitor", {})
     
-    # User Request: Use specific product name if not present
-    if "product_summary" in context:
-        if "Banana" not in str(context["product_summary"]) and "Nano" not in str(context["product_summary"]):
-             logger.info("[OVERRIDE] Injecting 'Nano Banana Pro' as product context")
-             context["product_summary"] = f"Nano Banana Pro ({context['product_summary']})"
-    else:
-        context["product_summary"] = "Nano Banana Pro"
-    
     # Check if we have the required data
     if not context:
         logger.error("[ERROR] Missing 'context' in state - cannot generate content")
@@ -315,13 +307,9 @@ TASK: IMPROVE the narrative by addressing the above feedback.
 
 RULES:
 - Pre-launch focused
+- No visuals
 - No virality tricks
 - Clear, credible, honest
-
-TASK:
-1. Generate the narrative.
-2. Extract Key Messages.
-3. For EACH Key Message, create an Instagram Post (Caption + Image Idea) for the product 'Nano Banana Pro'.
 
 CONTEXT: {context}
 AUDIENCE: {audience}
@@ -331,20 +319,26 @@ COMPETITOR: {competitor}
 
 {revision_context}
 
-Output JSON only. Make sure 'instagram_posts' array has one entry per key_message.
+Output JSON only.
 
 Output Schema:
 {{
-  "narrative_text": "",
+  "narrative_text": "The core narrative story",
   "key_messages": [],
-  "instagram_posts": [
-    {{
-      "key_message_ref": "message string",
-      "post_caption": "Caption with hashtags",
-      "image_idea": "Visual description"
-    }}
+  "assumptions_used": [],
+  "instagram": {{
+     "caption": "",
+     "visual_description": "",
+     "hashtags": []
+  }},
+  "twitter_thread": [
+     "Tweet 1",
+     "Tweet 2"
   ],
-  "assumptions_used": []
+  "linkedin_post": {{
+     "text": "",
+     "professional_tone_notes": ""
+  }}
 }}
 
 IMPORTANT: You MUST respond with ONLY valid JSON.
