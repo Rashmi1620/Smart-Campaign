@@ -315,6 +315,49 @@ export function CampaignTabs({ campaign }: { campaign: CampaignData }) {
                         ) : (
                             <WaitingState message="Creating ad content..." />
                         )}
+
+                        {/* Instagram Posts Section - User Requested Feature */}
+                        {content_result && content_result.instagram_posts && (
+                            <div className="space-y-4 animate-in fade-in-0 duration-500 delay-150">
+                                <div className="flex items-center gap-3 mt-8 mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                                        <span className="text-xl">📸</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Instagram Strategy</h3>
+                                        <p className="text-gray-400 text-sm">Social media content for Nano Banana Pro</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {content_result.instagram_posts.map((post: any, i: number) => (
+                                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-pink-500/30 transition-all group">
+                                            {/* Mock Image Placeholder */}
+                                            <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                <div className="text-center p-4">
+                                                    <span className="text-4xl mb-2 block">🍌</span>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Visual Concept</p>
+                                                    <p className="text-gray-400 text-sm mt-2">{post.image_idea}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-5">
+                                                <div className="mb-3">
+                                                    <span className="text-xs font-bold text-pink-400 uppercase tracking-wider">Key/Message</span>
+                                                    <p className="text-gray-300 text-sm line-clamp-2">{post.key_message_ref}</p>
+                                                </div>
+
+                                                <div>
+                                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Caption</span>
+                                                    <p className="text-white text-sm whitespace-pre-wrap mt-1 font-medium">{post.post_caption}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
