@@ -77,7 +77,9 @@ export default function CampaignPage({ params }: CampaignPageProps) {
             {/* Top Navigation / Brand */}
             <nav className="h-16 border-b border-gray-200 bg-white flex items-center px-6 md:px-12 sticky top-0 z-50">
                 <div className="font-bold text-xl tracking-tight">
-                    MARKET<span className="text-purple-600">MIND</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500">
+                        MARKETING MIND
+                    </span>
                     <span className="text-gray-400 font-light ml-1">AI</span>
                 </div>
                 <div className="ml-auto text-sm text-gray-500">
